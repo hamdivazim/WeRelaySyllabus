@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { db } from "@/lib/firebase";
 import { 
   collection, getDocs, query, orderBy, getDoc, 
-  addDoc, updateDoc, deleteDoc, Timestamp, doc, arrayUnion 
+  addDoc, updateDoc, deleteDoc, Timestamp, doc, arrayUnion, arrayRemove, serverTimestamp 
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
@@ -10,17 +10,16 @@ const INITIAL_EVENT_STATE = {
   title: "", description: "", location: "", type: "", colour: "#6366f1", startTime: "12:00", endTime: ""
 };
 
-export function useCourseData(courseId) {
+export function useCourseData(courseId = null) {
   const { user } = useAuth();
-
   const [events, setEvents] = useState([]);
   const [courseData, setCourseData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!courseId);
   const [isSaving, setIsSaving] = useState(false);
   const [editingEventId, setEditingEventId] = useState(null);
   const [newEvent, setNewEvent] = useState(INITIAL_EVENT_STATE);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!courseId) return;
     setLoading(true);
     try {
@@ -45,13 +44,52 @@ export function useCourseData(courseId) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
 
-  useEffect(() => { fetchData(); }, [courseId]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const resetCourseVouches = async () => {
+    if (!courseId) return;
     const courseRef = doc(db, "courses", courseId);
     await updateDoc(courseRef, { vouched: [] });
+  };
+
+  const createCourse = async (formData) => {
+    setIsSaving(true);
+    try {
+      const docRef = await addDoc(collection(db, "courses"), {
+        university: formData.university,
+        name: formData.name,
+        code: formData.code,
+        description: formData.description,
+        createdAt: serverTimestamp(),
+        vouched: []
+      });
+      return docRef.id;
+    } catch (error) {
+      console.error("Error creating course:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const updateCourseDetails = async (updates) => {
+    if (!courseId) return;
+    setIsSaving(true);
+    try {
+      const courseRef = doc(db, "courses", courseId);
+      await updateDoc(courseRef, { 
+        ...updates, 
+        vouched: [] 
+      });
+      await fetchData(); 
+    } catch (error) {
+      console.error("Error updating course:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const saveEvent = async (selectedDay, onSuccess) => {
@@ -61,13 +99,11 @@ export function useCourseData(courseId) {
       const dayDate = new Date(selectedDay);
       const [sh, sm] = newEvent.startTime.split(":");
       const startT = new Date(new Date(dayDate).setHours(parseInt(sh), parseInt(sm)));
-      
       let endT = null;
       if (newEvent.endTime) {
         const [eh, em] = newEvent.endTime.split(":");
         endT = new Date(new Date(dayDate).setHours(parseInt(eh), parseInt(em)));
       }
-
       const payload = {
         ...newEvent,
         start: Timestamp.fromDate(startT),
@@ -81,7 +117,6 @@ export function useCourseData(courseId) {
       }
       
       await resetCourseVouches();
-
       setNewEvent(INITIAL_EVENT_STATE);
       setEditingEventId(null);
       await fetchData();
@@ -97,9 +132,7 @@ export function useCourseData(courseId) {
     if (!editingEventId) return;
     try {
       await deleteDoc(doc(db, "courses", courseId, "events", editingEventId));
-      
       await resetCourseVouches();
-
       setNewEvent(INITIAL_EVENT_STATE);
       setEditingEventId(null);
       await fetchData();
@@ -143,21 +176,53 @@ export function useCourseData(courseId) {
     if (!user || !courseId) return;
     const hasVouched = courseData?.vouched?.includes(user.uid);
     if (hasVouched) return;
-
     try {
       const courseRef = doc(db, "courses", courseId);
-      await updateDoc(courseRef, {
-        vouched: arrayUnion(user.uid)
-      });
+      await updateDoc(courseRef, { vouched: arrayUnion(user.uid) });
       await fetchData();
     } catch (err) {
       console.error("Error vouching:", err);
     }
   };
 
+  const saveToProfile = async () => {
+    if (!user || !courseId) return;
+    setIsSaving(true);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        savedCourses: arrayUnion(courseId)
+      });
+      return true;
+    } catch (error) {
+      console.error("Error saving to profile:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const removeFromProfile = async () => {
+    if (!user || !courseId) return;
+    setIsSaving(true);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        savedCourses: arrayRemove(courseId)
+      });
+      return true;
+    } catch (error) {
+      console.error("Error removing from profile:", error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return {
     events, courseData, loading, isSaving, editingEventId, newEvent,
     setNewEvent, saveEvent, deleteEvent, startEditing, handleVouch,
+    createCourse, updateCourseDetails, saveToProfile, removeFromProfile,
     resetForm: () => { setNewEvent(INITIAL_EVENT_STATE); setEditingEventId(null); },
     downloadICS
   };

@@ -18,7 +18,7 @@ export default function RegisterPage() {
     setError("");
     try {
       await signup(email, password);
-      router.push("/dashboard");
+      router.push("/calendar/search");
     } catch (err) {
         console.log(err.code)
       const message = err.code === "auth/email-already-in-use" 

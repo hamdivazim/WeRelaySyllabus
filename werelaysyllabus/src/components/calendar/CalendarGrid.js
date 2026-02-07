@@ -45,7 +45,7 @@ export default function CalendarGrid({ monthGrid, currentMonthDate, eventsByDay,
                   <>
                     <div 
                       style={{ backgroundColor: dayEvents[0].colour }} 
-                      className="shrink-0 text-[10px] leading-tight font-black px-1.5 py-1 border-2 border-slate-900 rounded-md text-white uppercase truncate tracking-tight shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)]"
+                      className="shrink-0 text-[10px] leading-[1.1] font-black px-1.5 py-1 border-2 border-slate-900 rounded-md text-white uppercase tracking-tight shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)] line-clamp-2"
                     >
                       {dayEvents[0].title}
                     </div>
@@ -66,7 +66,7 @@ export default function CalendarGrid({ monthGrid, currentMonthDate, eventsByDay,
                         <div 
                           key={ev.id} 
                           style={{ backgroundColor: ev.colour }} 
-                          className="shrink-0 text-[10px] leading-tight font-black px-1.5 py-1 border-2 border-slate-900 rounded-md text-white uppercase truncate tracking-tight shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)]"
+                          className="shrink-0 text-[10px] leading-[1.1] font-black px-1.5 py-1 border-2 border-slate-900 rounded-md text-white uppercase tracking-tight shadow-[1px_1px_0px_0px_rgba(0,0,0,0.15)] line-clamp-1"
                         >
                           {ev.title}
                         </div>

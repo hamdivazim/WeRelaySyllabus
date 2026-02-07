@@ -1,12 +1,31 @@
+"use client";
+
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { AlertTriangle, Trash2, X } from 'lucide-react';
+import { useState } from "react";
+import { AlertTriangle, Trash2, X, Lock } from 'lucide-react';
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function EventModal({ selectedDay, events, editingEventId, newEvent, isAdding, onClose, onStartEditing, onResetForm, onSave, onDelete, setNewEvent }) {
   const springTransition = { type: "spring", damping: 25, stiffness: 200 };
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
+  const { user } = useAuth();
+
+  const handleActionWithAuth = (e, callback) => {
+    if (e) e.preventDefault();
+    if (!user) {
+      setShowAuthAlert(true);
+      return;
+    }
+    callback();
+  };
 
   const handleDeleteClick = () => {
+    if (!user) {
+      setShowAuthAlert(true);
+      return;
+    }
     if (!showDeleteConfirm) {
       setShowDeleteConfirm(true);
     } else {
@@ -66,7 +85,7 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
             )}
           </div>
 
-          <form onSubmit={onSave} className="bg-slate-50 p-5 md:p-8 border-2 border-slate-900 rounded-[2rem] md:rounded-3xl space-y-4 shadow-[4px_4px_0px_0px_#f1f5f9] mb-4">
+          <form onSubmit={(e) => handleActionWithAuth(e, onSave)} className="bg-slate-50 p-5 md:p-8 border-2 border-slate-900 rounded-[2rem] md:rounded-3xl space-y-4 shadow-[4px_4px_0px_0px_#f1f5f9] mb-4">
             <div className="flex justify-between items-center mb-2 px-1">
               <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest italic">
                 {editingEventId ? 'Edit Mode' : 'New Event'}
@@ -130,6 +149,39 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
           </form>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {showAuthAlert && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowAuthAlert(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="relative w-full max-w-sm bg-white border-[4px] border-slate-900 p-8 shadow-[12px_12px_0px_0px_#000]"
+            >
+              <button onClick={() => setShowAuthAlert(false)} className="absolute top-4 right-4 p-1 hover:bg-slate-100 rounded-lg">
+                <X size={20} className="text-slate-900" strokeWidth={3} />
+              </button>
+              <div className="w-16 h-16 bg-indigo-50 border-4 border-slate-900 flex items-center justify-center mb-6 -rotate-6 shadow-[4px_4px_0px_0px_#000]">
+                <Lock className="text-indigo-600" size={32} strokeWidth={3} />
+              </div>
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic leading-none mb-4">Hold <span className="text-indigo-600">Up!</span></h3>
+              <p className="text-sm font-bold text-slate-600 uppercase tracking-tight mb-8">You need to be part of the relay to edit the schedule.</p>
+              <div className="flex flex-col gap-3">
+                <Link href="/login" className="w-full">
+                  <button className="w-full py-4 bg-rose-500 text-white border-4 border-slate-900 font-black uppercase italic shadow-[4px_4px_0px_0px_#000] hover:translate-y-[-2px] transition-all">Login Now</button>
+                </Link>
+                <button onClick={() => setShowAuthAlert(false)} className="w-full py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Maybe Later</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

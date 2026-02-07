@@ -15,7 +15,7 @@ export default function LoginPage() {
     try {
       setError("");
       await login(e, p);
-      router.push("/dashboard"); 
+      router.push("/calendar/saved"); 
     } catch (err) {
       setError("Invalid credentials. Try again!");
     }
