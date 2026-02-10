@@ -159,11 +159,15 @@ export function useCourseData(courseId = null) {
     if (!events.length) return;
     const formatDate = (d) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     let content = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Werelay//Syllabus//EN\n";
+    
     events.forEach(ev => {
-      content += `BEGIN:VEVENT\nUID:${ev.id}\nDTSTAMP:${formatDate(new Date())}\nDTSTART:${formatDate(ev.start)}\n`;
-      if (ev.end) content += `DTEND:${formatDate(ev.end)}\n`;
+      const startTime = new Date(ev.start);
+      const endTime = ev.end ? new Date(ev.end) : new Date(startTime.getTime() + 60 * 60 * 1000);
+
+      content += `BEGIN:VEVENT\nUID:${ev.id}\nDTSTAMP:${formatDate(new Date())}\nDTSTART:${formatDate(startTime)}\nDTEND:${formatDate(endTime)}\n`;
       content += `SUMMARY:${ev.title}\nDESCRIPTION:${(ev.description || "").replace(/\n/g, "\\n")}\nLOCATION:${ev.location || ""}\nEND:VEVENT\n`;
     });
+
     content += "END:VCALENDAR";
     const blob = new Blob([content], { type: "text/calendar" });
     const url = URL.createObjectURL(blob);
