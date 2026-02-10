@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { db } from "@/lib/firebase";
 import { 
   collection, getDocs, query, orderBy, getDoc, 
-  addDoc, updateDoc, deleteDoc, Timestamp, doc, arrayUnion, arrayRemove, serverTimestamp 
+  addDoc, updateDoc, deleteDoc, Timestamp, doc, arrayUnion, arrayRemove, serverTimestamp,
+  setDoc
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
@@ -190,9 +191,9 @@ export function useCourseData(courseId = null) {
     setIsSaving(true);
     try {
       const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
+      await setDoc(userRef, {
         savedCourses: arrayUnion(courseId)
-      });
+      }, { merge: true });
       return true;
     } catch (error) {
       console.error("Error saving to profile:", error);

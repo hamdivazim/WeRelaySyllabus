@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useCourseData } from "@/hooks/useCourseData";
 
 const INPUT_STYLE = "w-full bg-white border-[3px] border-slate-900 rounded-2xl px-5 py-4 font-black text-lg uppercase placeholder:text-slate-200 focus:bg-indigo-50 focus:shadow-[6px_6px_0px_0px_#6366f1] focus:translate-x-[-3px] focus:translate-y-[-3px] outline-none transition-all";
+const INPUT_STYLE_ROSE = "w-full bg-white border-[3px] border-slate-900 rounded-2xl px-5 py-4 font-black text-lg uppercase placeholder:text-slate-200 focus:shadow-[6px_6px_0px_0px_#f43f5e] focus:translate-x-[-3px] focus:translate-y-[-3px] outline-none transition-all";
 const LABEL_STYLE = "flex items-center gap-2 text-[11px] font-[1000] uppercase tracking-widest text-slate-400 mb-2 ml-1";
 
 export default function CreateCoursePage() {
@@ -128,7 +129,7 @@ export default function CreateCoursePage() {
                     placeholder="Algorithm Design & Analysis"
                     value={formData.name}
                     onChange={(e) => updateField("name", e.target.value)}
-                    className={INPUT_STYLE}
+                    className={INPUT_STYLE_ROSE}
                   />
                 </div>
 
@@ -139,7 +140,7 @@ export default function CreateCoursePage() {
                     placeholder="What should students know about this relay?"
                     value={formData.description}
                     onChange={(e) => updateField("description", e.target.value)}
-                    className={`${INPUT_STYLE} normal-case font-bold text-base md:text-lg resize-none`}
+                    className={`${INPUT_STYLE_ROSE} normal-case font-bold text-base md:text-lg resize-none`}
                   />
                 </div>
               </div>

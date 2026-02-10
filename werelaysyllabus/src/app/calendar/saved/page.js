@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Ghost, Search, Sparkles } from "lucide-react";
+import { ChevronLeft, Ghost, Search, Sparkles, LogOut, X, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CourseCard from "@/components/calendar/CourseCard"; 
 import { useAuth } from "@/context/AuthContext";
@@ -16,6 +16,7 @@ export default function SavedCoursesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSignOutAlert, setShowSignOutAlert] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -73,13 +74,24 @@ export default function SavedCoursesPage() {
       />
       <div className="max-w-4xl mx-auto relative z-10">
         <header className="mb-8 relative">
-          <motion.div 
-            initial={{ rotate: -5, x: -20 }}
-            animate={{ rotate: -2, x: 0 }}
-            className="bg-rose-600 text-white font-[1000] px-4 py-1 border-[3px] border-slate-900 uppercase text-xs md:text-sm mb-6 inline-block shadow-[4px_4px_0px_0px_#000] italic tracking-tighter"
-          >
-            WeRelaySyllabus
-          </motion.div>
+          <div className="flex justify-between items-start">
+            <motion.div 
+              initial={{ rotate: -5, x: -20 }}
+              animate={{ rotate: -2, x: 0 }}
+              className="bg-rose-600 text-white font-[1000] px-4 py-1 border-[3px] border-slate-900 uppercase text-xs md:text-sm mb-6 inline-block shadow-[4px_4px_0px_0px_#000] italic tracking-tighter"
+            >
+              WeRelaySyllabus
+            </motion.div>
+
+            <motion.button
+              whileHover={{ scale: 1.05, rotate: 3 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowSignOutAlert(true)}
+              className="p-3 bg-white border-[3px] border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_#000] hover:bg-rose-50 transition-all text-slate-900"
+            >
+              <LogOut size={20} strokeWidth={3} />
+            </motion.button>
+          </div>
 
           <h1 className="text-6xl md:text-8xl font-[1000] text-slate-900 uppercase italic leading-[0.8] tracking-tighter mb-4">
             Saved <br />
@@ -166,6 +178,39 @@ export default function SavedCoursesPage() {
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {showSignOutAlert && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setShowSignOutAlert(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="relative w-full max-w-sm bg-white border-[4px] border-slate-900 p-8 shadow-[12px_12px_0px_0px_#000]"
+            >
+              <button onClick={() => setShowSignOutAlert(false)} className="absolute top-4 right-4 p-1 hover:bg-slate-100 rounded-lg">
+                <X size={20} className="text-slate-900" strokeWidth={3} />
+              </button>
+              <div className="w-16 h-16 bg-rose-50 border-4 border-slate-900 flex items-center justify-center mb-6 -rotate-6 shadow-[4px_4px_0px_0px_#000]">
+                <Info className="text-rose-600" size={32} strokeWidth={3} />
+              </div>
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic leading-none mb-4">Signing <span className="text-rose-600">out?</span></h3>
+              <p className="text-sm font-bold text-slate-600 uppercase tracking-tight mb-8">Are you sure you want to sign out?</p>
+              <div className="flex flex-col gap-3">
+                <Link href="/signout" className="w-full">
+                  <button className="w-full py-4 bg-slate-900 text-white border-4 border-slate-900 font-black uppercase italic shadow-[4px_4px_0px_0px_#f43f5e] hover:translate-y-[-2px] transition-all">Yes, Sign Out</button>
+                </Link>
+                <button onClick={() => setShowSignOutAlert(false)} className="w-full py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Stay Logged In</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
