@@ -56,7 +56,14 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
             <div>
               <p className="text-[8px] md:text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-1">Reviewing Date</p>
               <h3 className="text-xl md:text-4xl font-[1000] italic text-slate-900 tracking-tight uppercase">
-                {selectedDay ? new Date(selectedDay).toLocaleDateString(undefined, { month: 'long', day: 'numeric' }) : ""}
+                {selectedDay ? (() => {
+                  const [year, month, day] = selectedDay.split('-').map(Number);
+                  return new Date(year, month - 1, day).toLocaleDateString(undefined, { 
+                    month: 'long', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  });
+                })() : ""}
               </h3>
             </div>
             <button onClick={onClose} className="px-3 py-2 md:px-4 md:py-2 border-2 border-slate-900 rounded-xl font-black text-[10px] md:text-xs hover:bg-rose-50 transition-all shadow-[3px_3px_0px_0px_#1e293b]">CLOSE</button>

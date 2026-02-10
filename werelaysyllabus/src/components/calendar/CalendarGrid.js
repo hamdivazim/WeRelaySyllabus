@@ -13,7 +13,7 @@ export default function CalendarGrid({ monthGrid, currentMonthDate, eventsByDay,
 
       <div className="flex-1 grid grid-cols-7 grid-rows-6 divide-x-2 divide-y-2 divide-slate-200 min-h-0 h-full">
         {monthGrid.map((cell, idx) => {
-          const k = cell.toISOString().slice(0, 10);
+          const k = `${cell.getFullYear()}-${String(cell.getMonth() + 1).padStart(2, '0')}-${String(cell.getDate()).padStart(2, '0')}`;
           const dayEvents = eventsByDay[k] || [];
           const isCurMonth = cell.getMonth() === currentMonthDate.getMonth();
           const isToday = cell.toDateString() === today.toDateString();
