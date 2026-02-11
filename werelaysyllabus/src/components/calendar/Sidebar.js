@@ -243,11 +243,11 @@ export default function Sidebar({ courseData, courseId, eventCount, onDownload, 
                   </div>
 
                   <div className="mt-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-3 px-1">Course ID</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-3 px-1">Course Code</p>
                     <div className="bg-slate-50 border-2 border-slate-900 rounded-xl p-4">
                       <h1 className="text-xs md:text-sm font-mono font-black tracking-tight text-slate-500 uppercase break-words leading-tight">
                         <span className="text-indigo-400 mr-2">#</span>
-                        {courseId}
+                        {courseData?.code}
                       </h1>
                     </div>
                   </div>
