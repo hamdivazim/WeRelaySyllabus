@@ -80,7 +80,7 @@ export default function AuthForm({ type, onSubmit, error, isLoading }) {
             className="group relative w-full py-4 md:py-6 bg-slate-900 text-white font-[1000] text-lg md:text-xl uppercase italic tracking-tighter overflow-hidden shadow-[4px_4px_0px_0px_#1e293b] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-70"
           >
             <span className="relative z-20">
-              {isLoading ? 'Processing...' : (isRegister ? 'Create Profile →' : 'Launch Syllabus →')}
+              {isLoading ? 'Processing...' : (isRegister ? 'Create Profile' : 'Launch Syllabus')}
             </span>
             
             <div className={`absolute inset-0 z-10 ${theme.btnHover} translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300 ease-out`} />
