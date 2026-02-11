@@ -2,6 +2,13 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function CourseHeader({ courseName, eventCount, currentMonthDate, onPrevMonth, onNextMonth, onToday }) {
+  const getFontSize = (text) => {
+    const length = text?.length || 0;
+    if (length > 25) return "text-2xl md:text-4xl lg:text-5xl";
+    if (length > 15) return "text-3xl md:text-5xl lg:text-6xl";
+    return "text-4xl md:text-6xl lg:text-7xl";
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
@@ -9,11 +16,12 @@ export default function CourseHeader({ courseName, eventCount, currentMonthDate,
       className="mb-4 md:mb-8 shrink-0"
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
-        <div className="space-y-1">
+        <div className="space-y-1 min-w-0 flex-1">
           <div className="bg-indigo-600 text-white px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest w-fit">
             Syllabus
           </div>
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-[1000] uppercase tracking-tighter leading-[0.85] text-slate-900 italic">
+          
+          <h1 className={`${getFontSize(courseName)} font-[1000] uppercase tracking-tighter leading-[0.85] text-slate-900 italic truncate line-clamp-1`}>
             {courseName || "Calendar"}
           </h1>
           <p className="text-[10px] md:text-sm font-bold text-slate-400 uppercase tracking-widest mt-2">
@@ -21,7 +29,7 @@ export default function CourseHeader({ courseName, eventCount, currentMonthDate,
           </p>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-3 shrink-0">
           <div className="flex items-center bg-white border-2 border-slate-900 rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_#1e293b]">
             <button onClick={onPrevMonth} className="px-4 py-2 font-black border-r-2 border-slate-900 hover:bg-slate-50 transition-colors">
                 <ChevronLeft size={24} />
