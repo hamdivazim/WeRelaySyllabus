@@ -1,16 +1,30 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { AlertTriangle, Trash2, X, Lock } from 'lucide-react';
+import { useState, useRef, useMemo } from "react";
+import { AlertTriangle, Trash2, X, Lock, Calendar } from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-export default function EventModal({ selectedDay, events, editingEventId, newEvent, isAdding, onClose, onStartEditing, onResetForm, onSave, onDelete, setNewEvent }) {
+export default function EventModal({ 
+  selectedDay, 
+  events, 
+  editingEventId, 
+  newEvent, 
+  isAdding, 
+  onClose, 
+  onStartEditing, 
+  onResetForm, 
+  onSave, 
+  onDelete, 
+  setNewEvent,
+  onDateChange
+}) {
   const springTransition = { type: "spring", damping: 25, stiffness: 200 };
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   const { user } = useAuth();
+  const dateInputRef = useRef(null);
 
   const handleActionWithAuth = (e, callback) => {
     if (e) e.preventDefault();
@@ -34,6 +48,16 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
     }
   };
 
+  const displayDate = useMemo(() => {
+    if (!selectedDay) return "";
+    const [year, month, day] = selectedDay.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString(undefined, { 
+      month: 'long', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }, [selectedDay]);
+
   return (
     <>
       <motion.div 
@@ -52,21 +76,33 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
         className="fixed inset-x-0 bottom-0 top-[10%] md:top-[8%] md:bottom-[8%] md:left-1/2 md:inset-x-auto md:ml-[-320px] md:w-[640px] bg-white border-t-4 md:border-2 border-slate-900 rounded-t-[2.5rem] md:rounded-3xl shadow-[0px_-10px_0px_0px_rgba(0,0,0,0.1),12px_12px_0px_0px_rgba(0,0,0,1)] z-[70] overflow-hidden flex flex-col"
       >
         <div className="p-5 md:p-10 flex-1 overflow-y-auto custom-scrollbar">
-          <div className="flex justify-between items-center mb-6 md:mb-10 border-b-2 border-slate-100 pb-6">
-            <div>
-              <p className="text-[8px] md:text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-1">Reviewing Date</p>
-              <h3 className="text-xl md:text-4xl font-[1000] italic text-slate-900 tracking-tight uppercase">
-                {selectedDay ? (() => {
-                  const [year, month, day] = selectedDay.split('-').map(Number);
-                  return new Date(year, month - 1, day).toLocaleDateString(undefined, { 
-                    month: 'long', 
-                    day: 'numeric',
-                    year: 'numeric'
-                  });
-                })() : ""}
+          <div className="flex justify-between items-start mb-6 md:mb-10 border-b-2 border-slate-100 pb-6">
+            <div className="relative flex-1">
+              <p className="text-[8px] md:text-[10px] font-black uppercase text-indigo-500 tracking-[0.4em] mb-1">
+                {editingEventId ? 'Event Date' : 'Reviewing Date'}
+              </p>
+              
+              <div className="md:hidden flex items-center gap-2 group cursor-pointer" onClick={() => dateInputRef.current?.showPicker()}>
+                <h3 className="text-xl font-[1000] italic text-slate-900 tracking-tight uppercase underline decoration-indigo-500 decoration-4 underline-offset-4">
+                  {displayDate}
+                </h3>
+                <Calendar size={18} className="text-indigo-600" />
+                
+                <input 
+                  ref={dateInputRef}
+                  type="date" 
+                  value={selectedDay}
+                  onChange={(e) => onDateChange(e.target.value)}
+                  className="absolute opacity-0 pointer-events-none"
+                />
+              </div>
+
+              <h3 className="hidden md:block text-4xl font-[1000] italic text-slate-900 tracking-tight uppercase">
+                {displayDate}
               </h3>
             </div>
-            <button onClick={onClose} className="px-3 py-2 md:px-4 md:py-2 border-2 border-slate-900 rounded-xl font-black text-[10px] md:text-xs hover:bg-rose-50 transition-all shadow-[3px_3px_0px_0px_#1e293b]">CLOSE</button>
+            
+            <button onClick={onClose} className="shrink-0 px-3 py-2 md:px-4 md:py-2 border-2 border-slate-900 rounded-xl font-black text-[10px] md:text-xs hover:bg-rose-50 transition-all shadow-[3px_3px_0px_0px_#1e293b]">CLOSE</button>
           </div>
 
           <div className="space-y-3 md:space-y-4 mb-8 md:mb-10">
@@ -88,6 +124,12 @@ export default function EventModal({ selectedDay, events, editingEventId, newEve
             ) : (
               <div className="py-6 md:py-8 text-center border-2 border-dashed border-slate-200 rounded-2xl">
                   <p className="text-[10px] md:text-sm font-bold text-slate-400 uppercase tracking-widest">No events registered</p>
+                  <button 
+                    onClick={() => onDateChange(new Date().toISOString().slice(0,10))}
+                    className="md:hidden mt-2 text-[8px] font-black text-indigo-600 underline"
+                  >
+                    Jump to Today
+                  </button>
               </div>
             )}
           </div>

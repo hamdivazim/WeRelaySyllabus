@@ -157,6 +157,7 @@ export default function CourseCalendarViewer() {
         {selectedDay && (
           <EventModal 
             selectedDay={selectedDay} 
+            onDateChange={setSelectedDay}
             events={eventsByDay[selectedDay]} 
             editingEventId={editingEventId} 
             newEvent={newEvent} 
