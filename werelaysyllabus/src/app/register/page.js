@@ -20,10 +20,13 @@ export default function RegisterPage() {
       await signup(email, password);
       router.push("/calendar/search");
     } catch (err) {
-        console.log(err.code)
       const message = err.code === "auth/email-already-in-use" 
         ? "That email is already taken!" 
-        : "Something went wrong. Try again.";
+        : err.code === "auth/invalid-email"
+        ? "The email address is incorrectly formatted."
+        : err.code === "auth/weak-password"
+        ? "This password is too weak!"
+        : "Something went wrong. Try again later.";
       setError(message);
     } finally {
       setLoading(false);
