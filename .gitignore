@@ -71,3 +71,5 @@ yarn-error.log*
 
 # Firestore database backup script
 db-backup/
+
+certificate.pdf

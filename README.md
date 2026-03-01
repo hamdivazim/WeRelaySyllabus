@@ -7,13 +7,13 @@
 
   <h1>🗓️ WeRelaySyllabus 🗓️</h1>
 
+  <h3>🥇 First Place Winner at the <a href="https://www.build4students.com/">Build4Students</a> hackathon! 🥇</h3>
+
   <h4> 
     <a href="https://we-relay-syllabus.vercel.app/">🔗 Try it out here</a> | 
     <a href="https://devpost.com/software/werelaysyllabus">🚀 Devpost page</a> | 
     <a href="https://www.youtube.com/watch?v=VUg1nECwY-E">▶️ YouTube demo</a>
   </h4>
-
-  <p>This is my entry to the <a href="https://www.build4students.com/">Build4Students</a> hackathon!</p>
   
   <details>
     <summary><b>📷 Click to view screenshots</b></summary>
